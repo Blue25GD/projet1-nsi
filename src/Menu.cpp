@@ -16,13 +16,19 @@ MainMenuResponse Menu::DisplayMainMenu() {
     std::string input;
     std::cin >> input;
 
-    if (input.length() > 1 || input[0]) {
+    if (input.length() != 1) {
         return INVALID;
     }
     int in = input[0] - '0';
+
     if (in < 0 || in > 2) {
         return INVALID;
     }
 
     return static_cast<MainMenuResponse>(in);
+}
+
+void Menu::Show() {
+    std::cout << "Print menu\n";
+    std::cout << this->DisplayMainMenu() << std::endl;
 }

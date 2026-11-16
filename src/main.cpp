@@ -1,8 +1,11 @@
 #include <iostream>
 
+#include "Menu.hpp"
+
 int main() {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    std::cout << "Hello, World!" << std::endl;
+    Menu menu;
+    menu.Show();
     return 0;
 }

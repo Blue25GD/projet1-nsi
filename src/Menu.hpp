@@ -18,6 +18,9 @@ public:
     ~Menu() = default;
 
     MainMenuResponse DisplayMainMenu();
+
+    void Show();
+
 };
 
 
