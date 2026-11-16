@@ -4,6 +4,7 @@
 
 #ifndef PROJET1_NSI_MENU_H
 #define PROJET1_NSI_MENU_H
+#include "Database.hpp"
 
 enum MainMenuResponse {
     QUIT = 0,
@@ -17,9 +18,16 @@ public:
     Menu() = default;
     ~Menu() = default;
 
-    MainMenuResponse DisplayMainMenu();
+    MainMenuResponse displayMainMenu();
+    void printError(const char* error);
 
-    void Show();
+    std::optional<Name> readNameFromUser(const char *prompt);
+    PhoneNumber readPhoneNumberFromUser(const char* prompt);
+
+    void read();
+    void write();
+
+    void show();
 
 };
 
