@@ -1,0 +1,40 @@
+#include "DiskHandler.hpp"
+
+#include <fstream>
+
+bool DiskHandler::write(const Database& db) {
+    std::ofstream file(getFilePath());
+    if (!file.is_open()) {
+        return false;
+    }
+
+    for (const auto& [name, phone] : db.data) {
+        file << name.get() << ":" << phone.get() << "\n";
+    }
+
+    return true;
+}
+
+Database DiskHandler::read() {
+    Database db;
+    std::ifstream file(getFilePath());
+    if (!file.is_open()) {
+        return db;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        size_t pos = line.find(':');
+        if (pos != std::string::npos) {
+            std::string nameStr = line.substr(0, pos);
+            Name name{std::move(nameStr)};
+
+            std::string phone = line.substr(pos + 1);
+            PhoneNumber phoneNumber{std::stoull(phone)};
+
+            db.data[name] = phoneNumber;
+        }
+    }
+
+    return db;
+}
