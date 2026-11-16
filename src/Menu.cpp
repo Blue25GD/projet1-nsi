@@ -29,6 +29,5 @@ MainMenuResponse Menu::DisplayMainMenu() {
 }
 
 void Menu::Show() {
-    std::cout << "Print menu\n";
     std::cout << this->DisplayMainMenu() << std::endl;
 }
