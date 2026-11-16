@@ -29,7 +29,9 @@ list(REMOVE_ITEM LIB_SOURCES "${CMAKE_SOURCE_DIR}/src/main.cpp")
 
 add_compile_definitions(PROJECT_ROOT_DIR="${CMAKE_SOURCE_DIR}")
 
-add_library(lib ${LIB_SOURCES})
+add_library(lib ${LIB_SOURCES}
+        src/Menu.cpp
+        src/Menu.hpp)
 target_include_directories(lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 # --- Executable ---
