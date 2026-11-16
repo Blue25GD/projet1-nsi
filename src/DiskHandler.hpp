@@ -9,7 +9,7 @@ class DiskHandler {
     ~DiskHandler() = default;
 
     /// Writes the database to disk. Returns true if the operation was successful, false otherwise.
-    static bool write(const Database& db);
+    static bool write(const DBStorage& db);
 
     static Database read();
 

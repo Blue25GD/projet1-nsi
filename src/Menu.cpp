@@ -3,12 +3,16 @@
 //
 
 #include "Menu.hpp"
+
 #include <cstdio>
 #include <iostream>
 #include <string>
 
+#include "DiskHandler.hpp"
+
 MainMenuResponse Menu::displayMainMenu() {
-    printf("0 - Quitter\n"
+    printf(
+        "0 - Quitter\n"
         "1 - Écrire dans le répertoire\n"
         "2 - Rechercher dans le répertoire\n"
         "Votre choix ? ");
@@ -28,29 +32,27 @@ MainMenuResponse Menu::displayMainMenu() {
     return static_cast<MainMenuResponse>(in);
 }
 
-void Menu::printError(const char *error) {
-    printf("%s\n", error);
-}
+void Menu::printError(const char *error) { printf("%s\n", error); }
 
 std::optional<Name> Menu::readNameFromUser(const char *prompt) {
     printf("%s", prompt);
     std::string input;
     std::cin >> input;
-    auto name = createName(input);
+    auto name = Database::createName(input);
     if (!name) {
         if (input == "0") {
             return std::nullopt;
         }
         throw std::invalid_argument("name");
     }
-    return *name;
+    return std::move(*name);
 }
 
 PhoneNumber Menu::readPhoneNumberFromUser(const char *prompt) {
     printf("%s", prompt);
     std::string input;
     std::cin >> input;
-    auto number = createPhoneNumber(input);
+    auto number = Database::createPhoneNumber(input);
     if (!number) {
         throw std::invalid_argument("number");
     }
@@ -63,7 +65,9 @@ void Menu::read() {
     if (!name) {
         throw std::invalid_argument("name");
     }
-    // TODO: Read from DB
+
+    std::optional<PhoneNumber> phoneNumber = db.at(std::move(*name));
+    // TODO
 }
 
 void Menu::write() {
@@ -76,7 +80,8 @@ void Menu::write() {
 
         const char *phoneNumberPrompt = "Téléphone : ";
         PhoneNumber phoneNumber = readPhoneNumberFromUser(phoneNumberPrompt);
-        // TODO: Write to DB
+
+        db.insert(std::move(*name), phoneNumber);
     }
 }
 

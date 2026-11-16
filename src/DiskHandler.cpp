@@ -2,13 +2,13 @@
 
 #include <fstream>
 
-bool DiskHandler::write(const Database& db) {
+bool DiskHandler::write(const DBStorage& data) {
     std::ofstream file(getFilePath());
     if (!file.is_open()) {
         return false;
     }
 
-    for (const auto& [name, phone] : db.data) {
+    for (const auto& [name, phone] : data) {
         file << name.get() << ":" << phone.get() << "\n";
     }
 
@@ -32,7 +32,7 @@ Database DiskHandler::read() {
             std::string phone = line.substr(pos + 1);
             PhoneNumber phoneNumber{std::stoull(phone)};
 
-            db.data[name] = phoneNumber;
+            db.insert(std::move(name), phoneNumber);
         }
     }
 
