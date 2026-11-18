@@ -1,3 +1,4 @@
+#!/bin/python3
 
 import random
 import string
@@ -33,9 +34,9 @@ def generate_tests(n):
     # Sequential read tests, using previously written names
     with open("read_test.txt", "w", buffering=1024 * 1024) as f:
         write = f.write
+        write("2\n")
 
         for name in names:
-            write("2\n")
             write(name)
             write("\n")
 
