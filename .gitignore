@@ -2,3 +2,6 @@ cmake-build*
 .idea
 build
 test.txt
+read_test.txt
+write_test.txt
+registry.txt
