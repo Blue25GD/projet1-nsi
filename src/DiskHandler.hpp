@@ -11,7 +11,7 @@ class DiskHandler {
     /// Writes the database to disk. Returns true if the operation was successful, false otherwise.
     static bool write(const DBStorage& db);
 
-    static Database read();
+    static DBStorage read();
 
    private:
     static std::filesystem::path getFilePath() {

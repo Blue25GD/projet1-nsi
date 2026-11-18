@@ -1,7 +1,6 @@
 # projet1-nsi
 
-https://github.com/Blue25GD/projet1-nsi
-
+https://pixees.fr/informatiquelycee/cours_premiere/ (Projet 1)
 
 ## Setup
 

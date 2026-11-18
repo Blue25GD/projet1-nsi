@@ -6,20 +6,24 @@
 #define PROJET1_NSI_MENU_H
 #include "Database.hpp"
 
-enum MainMenuResponse { QUIT = 0, WRITE = 1, READ = 2, INVALID };
+enum class MainMenuResponse { QUIT = 0, WRITE = 1, READ = 2, INVALID };
 
 class Menu {
     Database db;
+
+    bool returnToMainMenu = false;
 
    public:
     Menu() = default;
     ~Menu() = default;
 
-    MainMenuResponse displayMainMenu();
+    void init() { db.init(); }
+
+    static MainMenuResponse displayMainMenu();
     static void printError(const char* error);
 
-    static std::optional<Name> readNameFromUser(const char* prompt);
-    static PhoneNumber readPhoneNumberFromUser(const char* prompt);
+    std::optional<Name> readNameFromUser(const char* prompt);
+    static std::optional<PhoneNumber> readPhoneNumberFromUser(const char* prompt);
 
     void read();
     void write();

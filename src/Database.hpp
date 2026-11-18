@@ -57,6 +57,8 @@ class Database {
     DBStorage data;
 
    public:
+    void init();
+
     /// Returns std::nullopt if the name is invalid, or the parsed `Name` otherwise.
     static std::optional<Name> createName(std::string_view input);
 

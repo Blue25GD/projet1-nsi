@@ -15,8 +15,8 @@ bool DiskHandler::write(const DBStorage& data) {
     return true;
 }
 
-Database DiskHandler::read() {
-    Database db;
+DBStorage DiskHandler::read() {
+    DBStorage db;
     std::ifstream file(getFilePath());
     if (!file.is_open()) {
         return db;
@@ -32,7 +32,7 @@ Database DiskHandler::read() {
             std::string phone = line.substr(pos + 1);
             PhoneNumber phoneNumber{std::stoull(phone)};
 
-            db.insert(std::move(name), phoneNumber);
+            db[std::move(name)] = phoneNumber;
         }
     }
 

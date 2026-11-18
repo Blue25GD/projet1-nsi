@@ -2,6 +2,8 @@
 
 #include "DiskHandler.hpp"
 
+void Database::init() { data = DiskHandler::read(); }
+
 std::optional<Name> Database::createName(const std::string_view input) {
     std::string name;
     name.reserve(input.length());
@@ -32,4 +34,9 @@ void Database::insert(Name&& name, const PhoneNumber phoneNumber) {
     DiskHandler::write(data);
 }
 
-std::optional<PhoneNumber> Database::at(Name&& name) { return data.at(name); }
+std::optional<PhoneNumber> Database::at(Name&& name) {
+    auto it = data.find(name);
+    if (it == data.end()) return std::nullopt;
+
+    return it->second;
+}

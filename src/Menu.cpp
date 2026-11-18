@@ -21,18 +21,18 @@ MainMenuResponse Menu::displayMainMenu() {
     std::cin >> input;
 
     if (input.length() != 1) {
-        return INVALID;
+        return MainMenuResponse::INVALID;
     }
     int in = input[0] - '0';
 
     if (in < 0 || in > 2) {
-        return INVALID;
+        return MainMenuResponse::INVALID;
     }
 
     return static_cast<MainMenuResponse>(in);
 }
 
-void Menu::printError(const char *error) { printf("%s\n", error); }
+void Menu::printError(const char *error) { printf("\033[1;31mErreur : %s\n\033[0m", error); }
 
 std::optional<Name> Menu::readNameFromUser(const char *prompt) {
     printf("%s", prompt);
@@ -41,67 +41,79 @@ std::optional<Name> Menu::readNameFromUser(const char *prompt) {
     auto name = Database::createName(input);
     if (!name) {
         if (input == "0") {
+            returnToMainMenu = true;
             return std::nullopt;
         }
-        throw std::invalid_argument("name");
+
+        printError("Nom invalide\n");
+        return std::nullopt;
     }
     return std::move(*name);
 }
 
-PhoneNumber Menu::readPhoneNumberFromUser(const char *prompt) {
+std::optional<PhoneNumber> Menu::readPhoneNumberFromUser(const char *prompt) {
     printf("%s", prompt);
     std::string input;
     std::cin >> input;
-    auto number = Database::createPhoneNumber(input);
-    if (!number) {
-        throw std::invalid_argument("number");
+    auto phone = Database::createPhoneNumber(input);
+    if (!phone) {
+        printError("Numéro de téléphone invalide\n");
+        return std::nullopt;
     }
-    return *number;
+    return *phone;
 }
 
 void Menu::read() {
-    const char *namePrompt = "Entrer un nom : ";
-    auto name = readNameFromUser(namePrompt);
-    if (!name) {
-        throw std::invalid_argument("name");
-    }
+    const char *namePrompt = "Entrer un nom (0 pour retourner au menu principal) : ";
+    std::optional<Name> name = readNameFromUser(namePrompt);
+    if (!name) return;
 
-    std::optional<PhoneNumber> phoneNumber = db.at(std::move(*name));
-    // TODO
+    const std::optional<PhoneNumber> phoneNumber = db.at(std::move(*name));
+    if (!phoneNumber) {
+        printError("Nom introuvable\n");
+        return;
+    }
+    printf("Téléphone : %lu\n", phoneNumber->get());
 }
 
 void Menu::write() {
     while (true) {
-        const char *namePrompt = "Nom (0 pour terminer) : ";
+        const char *namePrompt = "Nom (0 pour retourner au menu principal) : ";
         auto name = readNameFromUser(namePrompt);
-        if (!name) {
-            return;
-        }
+        if (!name) return;
 
         const char *phoneNumberPrompt = "Téléphone : ";
-        PhoneNumber phoneNumber = readPhoneNumberFromUser(phoneNumberPrompt);
+        const std::optional<PhoneNumber> phoneNumber = readPhoneNumberFromUser(phoneNumberPrompt);
+        if (!phoneNumber) return;
 
-        db.insert(std::move(*name), phoneNumber);
+        db.insert(std::move(*name), *phoneNumber);
     }
 }
 
 void Menu::show() {
     MainMenuResponse res = displayMainMenu();
 
-    switch (res) {
-        case INVALID: {
-            const char *message = "Commande invalide";
-            printError(message);
-            break;
+    while (true) {
+        if (returnToMainMenu) {
+            returnToMainMenu = false;
+            res = displayMainMenu();
         }
-        case QUIT:
-            printf("Bye!\n");
-            break;
-        case WRITE:
-            write();
-            break;
-        case READ:
-            read();
-            break;
+
+        switch (res) {
+            case MainMenuResponse::INVALID: {
+                const char *message = "Commande invalide";
+                printError(message);
+                break;
+            }
+            case MainMenuResponse::QUIT:
+                printf("Bye!\n");
+                return;
+            case MainMenuResponse::WRITE:
+                write();
+                break;
+            case MainMenuResponse::READ:
+                read();
+                break;
+        }
     }
 }
