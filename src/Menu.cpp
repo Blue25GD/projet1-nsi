@@ -1,8 +1,6 @@
-//
-// Created by Alexandru Popescu on 16/11/2026.
-//
-
 #include "Menu.hpp"
+
+#include <unistd.h>
 
 #include <cstdio>
 #include <iostream>
@@ -10,8 +8,22 @@
 
 #include "DiskHandler.hpp"
 
+void Menu::print(const char *message, ...) {
+    static const bool isInteractive = isatty(STDOUT_FILENO);
+    if (isInteractive) {
+        va_list args;
+        va_start(args, message);
+        vprintf(message, args);
+        va_end(args);
+    }
+}
+
+__attribute__((cold, noinline)) void Menu::printError(const char *error) {
+    print("\033[1;31mErreur : %s\n\033[0m", error);
+}
+
 MainMenuResponse Menu::displayMainMenu() {
-    printf(
+    print(
         "0 - Quitter\n"
         "1 - Écrire dans le répertoire\n"
         "2 - Rechercher dans le répertoire\n"
@@ -32,15 +44,12 @@ MainMenuResponse Menu::displayMainMenu() {
     return static_cast<MainMenuResponse>(in);
 }
 
-void Menu::printError(const char *error) { printf("\033[1;31mErreur : %s\n\033[0m", error); }
-
 std::optional<Name> Menu::readNameFromUser(const char *prompt) {
-    printf("%s", prompt);
-    std::string input;
-    std::cin >> input;
-    auto name = Database::createName(input);
-    if (!name) {
-        if (input == "0") {
+    print("%s", prompt);
+    std::cin >> inputBuffer;
+    auto name = Database::createName(inputBuffer);
+    if (!name) [[unlikely]] {
+        if (inputBuffer == "0") {
             returnToMainMenu = true;
             return std::nullopt;
         }
@@ -52,11 +61,10 @@ std::optional<Name> Menu::readNameFromUser(const char *prompt) {
 }
 
 std::optional<PhoneNumber> Menu::readPhoneNumberFromUser(const char *prompt) {
-    printf("%s", prompt);
-    std::string input;
-    std::cin >> input;
-    auto phone = Database::createPhoneNumber(input);
-    if (!phone) {
+    print("%s", prompt);
+    std::cin >> inputBuffer;
+    auto phone = Database::createPhoneNumber(inputBuffer);
+    if (!phone) [[unlikely]] {
         printError("Numéro de téléphone invalide\n");
         return std::nullopt;
     }
@@ -73,7 +81,7 @@ void Menu::read() {
         printError("Nom introuvable\n");
         return;
     }
-    printf("Téléphone : %lu\n", phoneNumber->get());
+    print("Téléphone : %lu\n", phoneNumber->get());
 }
 
 void Menu::write() {
@@ -106,7 +114,7 @@ void Menu::show() {
                 break;
             }
             case MainMenuResponse::QUIT:
-                printf("Bye!\n");
+                print("Bye!\n");
                 db.close();
                 return;
             case MainMenuResponse::WRITE:

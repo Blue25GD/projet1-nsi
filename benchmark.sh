@@ -1,7 +1,9 @@
 #!/bin/bash
 
-printf "\033[0;33m[INFO] Building project...\033[0m\n"
-cmake --build build
+if [[ "$1" != "-r" ]]; then
+    printf "\033[0;33m[INFO] Building project...\033[0m\n"
+    cmake --build build
+fi
 
 printf "\033[0;33m[INFO] Running write benchmark...\033[0m"
 rm -rf database.txt
