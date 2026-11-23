@@ -7,7 +7,7 @@ void Database::init() {
     diskHandler.init();
 }
 
-void Database::close() { diskHandler.write(data); }
+void Database::close() { saveToFile(); }
 
 std::optional<Name> Database::createName(const std::string_view input) {
     std::string name;
@@ -42,4 +42,8 @@ std::optional<PhoneNumber> Database::at(Name&& name) {
     if (it == data.end()) return std::nullopt;
 
     return it->second;
+}
+
+void Database::saveToFile() {
+    diskHandler.write(data);
 }

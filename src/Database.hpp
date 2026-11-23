@@ -23,4 +23,6 @@ class Database {
     void insert(Name&& name, PhoneNumber phoneNumber);
 
     std::optional<PhoneNumber> at(Name&& name);
+
+    void saveToFile();
 };
