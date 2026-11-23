@@ -1,15 +1,13 @@
 #include "DiskHandler.hpp"
 
+#include <cassert>
 #include <fstream>
 
 bool DiskHandler::write(const DBStorage& data) {
-    std::ofstream file(getFilePath());
-    if (!file.is_open()) {
-        return false;
-    }
+    assert(fileStream.is_open() && "File stream is not open. Call init() before writing to disk.");
 
     for (const auto& [name, phone] : data) {
-        file << name.get() << ":" << phone.get() << "\n";
+        fileStream << name.get() << ":" << phone.get() << "\n";
     }
 
     return true;
@@ -17,13 +15,12 @@ bool DiskHandler::write(const DBStorage& data) {
 
 DBStorage DiskHandler::read() {
     DBStorage db;
-    std::ifstream file(getFilePath());
-    if (!file.is_open()) {
-        return db;
-    }
+
+    std::ifstream inputFileStream(getFilePath());
+    if (!inputFileStream.is_open()) return db;  // No database stored
 
     std::string line;
-    while (std::getline(file, line)) {
+    while (std::getline(inputFileStream, line)) {
         size_t pos = line.find(':');
         if (pos != std::string::npos) {
             std::string nameStr = line.substr(0, pos);

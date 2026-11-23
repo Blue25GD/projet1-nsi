@@ -107,6 +107,7 @@ void Menu::show() {
             }
             case MainMenuResponse::QUIT:
                 printf("Bye!\n");
+                db.close();
                 return;
             case MainMenuResponse::WRITE:
                 write();

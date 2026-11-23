@@ -44,4 +44,4 @@ def generate_tests(n):
 
 
 if __name__ == "__main__":
-    generate_tests(10**6)
+    generate_tests(10 ** 6)

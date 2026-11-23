@@ -1,15 +1,20 @@
 #pragma once
 #include <filesystem>
+#include <fstream>
 
-#include "Database.hpp"
+#include "DBStorage.hpp"
 
 class DiskHandler {
+    std::ofstream fileStream;
+
    public:
     DiskHandler() = default;
     ~DiskHandler() = default;
 
+    void init() { fileStream = std::ofstream(getFilePath()); }
+
     /// Writes the database to disk. Returns true if the operation was successful, false otherwise.
-    static bool write(const DBStorage& db);
+    bool write(const DBStorage& db);
 
     static DBStorage read();
 
