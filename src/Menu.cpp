@@ -138,6 +138,7 @@ void Menu::show() {
             case MainMenuResponse::INVALID: {
                 const char *message = "Commande invalide";
                 printError(message);
+                returnToMainMenu = true;
                 break;
             }
             case MainMenuResponse::QUIT:
