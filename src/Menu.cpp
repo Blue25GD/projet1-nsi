@@ -44,12 +44,34 @@ MainMenuResponse Menu::displayMainMenu() {
     return static_cast<MainMenuResponse>(in);
 }
 
+template <size_t MAX_LENGTH>
+bool Menu::readInput(char *buf) {
+    static constexpr auto fmt = [] {
+        std::array<char, 16> buf{'%'};
+        auto [ptr, _] = std::to_chars(buf.data() + 1, buf.data() + buf.size() - 2, MAX_LENGTH);
+        *ptr = 's';
+        return buf;
+    }();
+
+    int res;
+    while ((res = std::scanf(fmt.data(), buf) != 1)) {
+        if (res == EOF) [[unlikely]] {
+            return false;
+        }
+    }
+    return true;
+}
+
 std::optional<Name> Menu::readNameFromUser(const char *prompt) {
     print("%s", prompt);
-    std::cin >> inputBuffer;
-    auto name = Database::createName(inputBuffer);
+
+    char buf[Name::MAX_LENGTH + 1];
+    if (!readInput<Name::MAX_LENGTH>(buf)) [[unlikely]]
+        return std::nullopt;
+
+    auto name = Database::createName(buf);
     if (!name) [[unlikely]] {
-        if (inputBuffer == "0") {
+        if (buf[0] == '0' && buf[1] == '\0') {
             returnToMainMenu = true;
             return std::nullopt;
         }
@@ -57,13 +79,18 @@ std::optional<Name> Menu::readNameFromUser(const char *prompt) {
         printError("Nom invalide\n");
         return std::nullopt;
     }
+
     return std::move(*name);
 }
 
 std::optional<PhoneNumber> Menu::readPhoneNumberFromUser(const char *prompt) {
     print("%s", prompt);
-    std::cin >> inputBuffer;
-    auto phone = Database::createPhoneNumber(inputBuffer);
+
+    char buf[PhoneNumber::MAX_LENGTH + 1];
+    if (!readInput<PhoneNumber::MAX_LENGTH>(buf)) [[unlikely]]
+        return std::nullopt;
+
+    auto phone = Database::createPhoneNumber(buf);
     if (!phone) [[unlikely]] {
         printError("Numéro de téléphone invalide\n");
         return std::nullopt;

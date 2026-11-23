@@ -6,6 +6,8 @@ class Name {
     std::string name;
 
    public:
+    static constexpr size_t MAX_LENGTH = 30;
+
     explicit Name(std::string&& name) : name(std::move(name)) {}
 
     Name(Name&&) = default;
@@ -37,6 +39,8 @@ class PhoneNumber {
     uint64_t number;
 
    public:
+    static constexpr size_t MAX_LENGTH = 16;
+
     PhoneNumber() = default;
     explicit PhoneNumber(const uint64_t number) : number(number) {}
 

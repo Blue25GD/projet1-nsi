@@ -22,9 +22,12 @@ class Menu {
 
     static MainMenuResponse displayMainMenu();
 
+    template <size_t MAX_LENGTH>
+    static bool readInput(char* buf);
+
     std::optional<Name> readNameFromUser(const char* prompt);
 
-    std::optional<PhoneNumber> readPhoneNumberFromUser(const char* prompt);
+    static std::optional<PhoneNumber> readPhoneNumberFromUser(const char* prompt);
 
     void read();
     void write();
