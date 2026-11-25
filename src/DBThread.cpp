@@ -22,15 +22,18 @@ void DBThread::run() {
             continue;
 
         lock.unlock();
-
         db->saveToFile();
-
         lock.lock();
     }
 }
 
 void DBThread::close() {
-    running = false;
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        running = false;
+    }
+
+    cv.notify_one();
 
     if (thread.joinable())
         thread.join();
