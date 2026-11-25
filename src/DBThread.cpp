@@ -13,9 +13,13 @@ void DBThread::run() {
     std::unique_lock<std::mutex> lock(mutex);
 
     while (running) {
-        std::this_thread::sleep_for(SAVE_INTERVAL);
+        if (cv.wait_for(lock, SAVE_INTERVAL,
+                        [this] { return !running; })) {
+            break;
+                        }
 
-        if (!dirty.exchange(false, std::memory_order_relaxed)) continue;
+        if (!dirty.exchange(false, std::memory_order_relaxed))
+            continue;
 
         lock.unlock();
 
@@ -32,4 +36,7 @@ void DBThread::close() {
         thread.join();
 }
 
-void DBThread::start() { thread = std::thread(&DBThread::run, this); }
+void DBThread::start() {
+    running = true;
+    thread = std::thread(&DBThread::run, this);
+}
