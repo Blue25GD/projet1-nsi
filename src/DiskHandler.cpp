@@ -6,11 +6,15 @@
 bool DiskHandler::write(const DBStorage& data) {
     assert(fileStream.is_open() && "File stream is not open. Call init() before writing to disk.");
 
+    fileStream.seekp(0);
+
     for (const auto& [name, phone] : data) {
         fileStream << name.get() << ":" << phone.get() << "\n";
     }
 
-    return true;
+    fileStream.flush();
+
+    return fileStream.good();
 }
 
 DBStorage DiskHandler::read() {

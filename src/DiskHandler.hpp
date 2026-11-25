@@ -11,7 +11,7 @@ class DiskHandler {
     DiskHandler() = default;
     ~DiskHandler() = default;
 
-    void init() { fileStream = std::ofstream(getFilePath()); }
+    void init() { fileStream = std::ofstream(getFilePath(), std::ios::out | std::ios::trunc); }
 
     /// Writes the database to disk. Returns true if the operation was successful, false otherwise.
     bool write(const DBStorage& db);

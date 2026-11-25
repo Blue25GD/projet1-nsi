@@ -21,6 +21,10 @@ void Menu::print(const char *message, ...) {
 __attribute__((cold, noinline)) void Menu::printError(const char *error) {
     print("\033[1;31mErreur : %s\n\033[0m", error);
 }
+void Menu::init() {
+    db.init();
+    dbThread.init(db);
+}
 
 MainMenuResponse Menu::displayMainMenu() {
     print(
@@ -133,10 +137,12 @@ void Menu::write() {
         if (!phoneNumber) return;
 
         db.insert(std::move(*name), *phoneNumber);
+        dbThread.write();
     }
 }
 
 void Menu::show() {
+    dbThread.start();
     MainMenuResponse res = displayMainMenu();
 
     while (true) {
@@ -154,6 +160,7 @@ void Menu::show() {
             }
             case MainMenuResponse::QUIT:
                 print("Bye!\n");
+                dbThread.close();
                 db.close();
                 return;
             case MainMenuResponse::WRITE:

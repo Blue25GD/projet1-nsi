@@ -1,11 +1,13 @@
 #pragma once
 
+#include "DBThread.hpp"
 #include "Database.hpp"
 
 enum class MainMenuResponse { QUIT = 0, WRITE = 1, READ = 2, INVALID };
 
 class Menu {
     Database db;
+    DBThread dbThread;
 
     std::string inputBuffer;
 
@@ -18,7 +20,7 @@ class Menu {
     __attribute__((format(printf, 1, 2))) static void print(const char* message, ...);
     static void printError(const char* error);
 
-    void init() { db.init(); }
+    void init();
 
     static MainMenuResponse displayMainMenu();
 
@@ -31,6 +33,7 @@ class Menu {
 
     void read();
     void write();
+    void close();
 
     void show();
 };

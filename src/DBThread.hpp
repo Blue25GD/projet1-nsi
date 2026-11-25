@@ -1,5 +1,10 @@
+
 #pragma once
 
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 
 #include "Database.hpp"
@@ -7,18 +12,30 @@
 class DBThread {
 public:
     DBThread() = default;
+    ~DBThread();
 
-    ~DBThread() = default;
+    DBThread(const DBThread&) = delete;
+    DBThread& operator=(const DBThread&) = delete;
 
-    void run(Database& db);
+    void init(Database& db);
+
+    void write() noexcept;
     void close();
 
-    void write();
+    void start();
 
 private:
-    std::thread thread;
-    std::atomic<bool> running{true};
-    std::atomic<bool> write_db{false};
-    Database& db;
+    void run();
 
+    Database* db = nullptr;
+    std::thread thread;
+
+    std::mutex mutex;
+    std::condition_variable cv;
+
+    std::atomic<bool> dirty{false};
+    std::atomic<bool> running{false};
+
+    static constexpr auto SAVE_INTERVAL =
+        std::chrono::milliseconds(100);
 };
