@@ -44,6 +44,4 @@ std::optional<PhoneNumber> Database::at(Name&& name) {
     return it->second;
 }
 
-void Database::saveToFile() {
-    diskHandler.write(data);
-}
+void Database::saveToFile() { diskHandler.write(data); }

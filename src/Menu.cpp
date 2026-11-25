@@ -45,33 +45,43 @@ MainMenuResponse Menu::displayMainMenu() {
 }
 
 template <size_t MAX_LENGTH>
-bool Menu::readInput(char *buf) {
-    static constexpr auto fmt = [] {
-        std::array<char, 16> buf{'%'};
-        auto [ptr, _] = std::to_chars(buf.data() + 1, buf.data() + buf.size() - 2, MAX_LENGTH);
-        *ptr = 's';
-        return buf;
-    }();
+std::string_view Menu::readInput(std::array<char, MAX_LENGTH + 2> &buf) {
+    while (std::fgets(buf.data(), buf.size(), stdin)) {
+        char *data = buf.data();
+        size_t len = std::strlen(data);
 
-    int res;
-    while ((res = std::scanf(fmt.data(), buf) != 1)) {
-        if (res == EOF) [[unlikely]] {
-            return false;
+        // Strip back
+        while (len > 0 && std::isspace(static_cast<unsigned char>(data[len - 1]))) --len;
+        if (len > MAX_LENGTH) [[unlikely]] {
+            printError("Entree trop longue\n");
+            return {};
         }
+
+        // Strip front
+        while (len > 0 && std::isspace(static_cast<unsigned char>(*data))) {
+            ++data;
+            --len;
+        }
+
+        if (len == 0) continue;
+
+        return {data, len};
     }
-    return true;
+
+    return {};
 }
 
 std::optional<Name> Menu::readNameFromUser(const char *prompt) {
     print("%s", prompt);
 
-    char buf[Name::MAX_LENGTH + 1];
-    if (!readInput<Name::MAX_LENGTH>(buf)) [[unlikely]]
+    std::array<char, Name::MAX_LENGTH + 2> buf;
+    const std::string_view str = readInput<Name::MAX_LENGTH>(buf);
+    if (str.empty()) [[unlikely]]
         return std::nullopt;
 
-    auto name = Database::createName(buf);
+    std::optional<Name> name = Database::createName(str);
     if (!name) [[unlikely]] {
-        if (buf[0] == '0' && buf[1] == '\0') {
+        if (str == "0") {
             returnToMainMenu = true;
             return std::nullopt;
         }
@@ -86,11 +96,12 @@ std::optional<Name> Menu::readNameFromUser(const char *prompt) {
 std::optional<PhoneNumber> Menu::readPhoneNumberFromUser(const char *prompt) {
     print("%s", prompt);
 
-    char buf[PhoneNumber::MAX_LENGTH + 1];
-    if (!readInput<PhoneNumber::MAX_LENGTH>(buf)) [[unlikely]]
+    std::array<char, PhoneNumber::MAX_LENGTH + 2> buf;
+    const std::string_view str = readInput<PhoneNumber::MAX_LENGTH>(buf);
+    if (str.empty()) [[unlikely]]
         return std::nullopt;
 
-    auto phone = Database::createPhoneNumber(buf);
+    std::optional<PhoneNumber> phone = Database::createPhoneNumber(str);
     if (!phone) [[unlikely]] {
         printError("Numéro de téléphone invalide\n");
         return std::nullopt;

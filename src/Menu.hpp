@@ -23,7 +23,7 @@ class Menu {
     static MainMenuResponse displayMainMenu();
 
     template <size_t MAX_LENGTH>
-    static bool readInput(char* buf);
+    static std::string_view readInput(std::array<char, MAX_LENGTH + 2>& buf);
 
     std::optional<Name> readNameFromUser(const char* prompt);
 
